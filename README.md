@@ -32,7 +32,13 @@ cd BetterBrave
 
 ## Usage
 
-[Add usage instructions here based on your project structure]
+1. Turn on developer mode in brave after navigating to Manage Extensions
+2. Click on load unpacked and navigate to where you cloned the repository and navigate inside the BetterBrave folder and click on the "Select" folder. (do     NOT navigate inside it)
+3. Click open and load the extension
+4. Open a new tab and select "keep changes" when prompted by Brave
+5. If brave displays a footer with the button "customize brave", click it and toggle the footer off
+6. In the new tab, click on the settings button in the bottom right corner to configure the new tab
+7. Enjoy!
 
 ## Contributing
 
