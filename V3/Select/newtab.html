@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>New Tab</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <div class="bg-wallpaper" id="bgWallpaper" aria-hidden="true">
+    <video id="bgVideo" autoplay loop muted playsinline hidden></video>
+    <img id="bgImage" alt="" hidden>
+    <div class="bg-wallpaper-dim"></div>
+  </div>
+
+  <button class="widget-toggle-btn" id="exitLayoutEdit" hidden>Done arranging</button>
+
+  <div class="layout-grid-overlay" id="layoutGrid" aria-hidden="true">
+    <div class="grid-center-v"></div>
+    <div class="grid-center-h"></div>
+  </div>
+
+  <main class="stage" id="stage">
+
+    <div class="widget" id="widget-weather" data-widget="weather">
+      <div class="widget-drag-handle" title="Drag to move">⠿</div>
+      <div class="wx-widget" id="wxWidget" data-mode="simple">
+        <!-- Mode 1: Simple -->
+        <button class="weather-chip" id="weatherChip" type="button" title="Click for details">
+          <span class="weather-icon" id="weatherIcon">🌤️</span>
+          <span class="weather-text">
+            <span class="weather-temp" id="weatherTemp">Set location</span>
+            <span class="weather-loc" id="weatherLoc"></span>
+          </span>
+        </button>
+
+        <!-- Mode 2: Day recap -->
+        <button class="wx-day-card" id="wxDayCard" type="button" title="Click for details">
+          <div class="wx-day-top">
+            <span class="wx-day-icon" id="wxDayIcon">🌤️</span>
+            <div class="wx-day-main">
+              <span class="wx-day-temp" id="wxDayTemp">–°</span>
+              <span class="wx-day-cond" id="wxDayCond">Set location</span>
+              <span class="wx-day-feels" id="wxDayFeels"></span>
+            </div>
+          </div>
+          <p class="wx-day-recap" id="wxDayRecap"></p>
+          <div class="wx-day-stats" id="wxDayStats"></div>
+        </button>
+
+        <!-- Mode 3: Week strip -->
+        <button class="wx-week-card" id="wxWeekCard" type="button" title="Click for details">
+          <div class="wx-week-days" id="wxWeekDays"></div>
+        </button>
+      </div>
+      <div class="widget-resize-handle" title="Drag to resize"></div>
+    </div>
+
+    <div class="widget" id="widget-clock" data-widget="clock">
+      <div class="widget-drag-handle" title="Drag to move">⠿</div>
+      <section class="hero" id="clockFace" data-style="digital">
+        <!-- Digital -->
+        <div class="clock-digital" id="clockDigital">
+          <div class="hero-clock" id="clock">00:00:00</div>
+        </div>
+        <!-- Nixie -->
+        <div class="clock-nixie icon-hidden" id="clockNixie"></div>
+        <!-- Analog -->
+        <div class="clock-analog icon-hidden" id="clockAnalog">
+          <svg viewBox="0 0 200 200" class="analog-face">
+            <circle cx="100" cy="100" r="96" class="analog-ring"/>
+            <g id="analogTicks"></g>
+            <line id="analogHour" x1="100" y1="100" x2="100" y2="55" class="analog-hand analog-hand-hour"/>
+            <line id="analogMinute" x1="100" y1="100" x2="100" y2="35" class="analog-hand analog-hand-minute"/>
+            <line id="analogSecond" x1="100" y1="100" x2="100" y2="28" class="analog-hand analog-hand-second"/>
+            <circle cx="100" cy="100" r="4" class="analog-pin"/>
+          </svg>
+        </div>
+        <!-- Flip (split-flap) -->
+        <div class="clock-flip icon-hidden" id="clockFlip"></div>
+        <!-- LED -->
+        <div class="clock-led icon-hidden" id="clockLed">
+          <div class="led-ghost">88:88:88</div>
+          <div class="led-digits" id="ledDigits">00:00:00</div>
+        </div>
+        <!-- Minimal -->
+        <div class="clock-minimal icon-hidden" id="clockMinimal">
+          <div class="minimal-time" id="minimalTime">00:00:00</div>
+        </div>
+        <div class="hero-date" id="dateLine">—</div>
+        <div class="hero-greeting" id="greeting">Hello</div>
+      </section>
+      <div class="widget-resize-handle" title="Drag to resize"></div>
+    </div>
+
+    <div class="widget" id="widget-search" data-widget="search">
+      <div class="widget-drag-handle" title="Drag to move">⠿</div>
+      <form class="cmdbar" id="cmdForm" autocomplete="off">
+        <select class="cmdbar-engine" id="engineSelect" aria-label="Search engine">
+          <option value="brave">Brave Search</option>
+          <option value="google">Google</option>
+          <option value="ddg">DuckDuckGo</option>
+          <option value="bing">Bing</option>
+        </select>
+        <input class="cmdbar-input" id="cmdInput" type="text" placeholder="Search or type a URL" aria-label="Search or type a URL">
+        <button class="cmdbar-go" type="submit" aria-label="Go">→</button>
+      </form>
+      <div class="widget-resize-handle" title="Drag to resize"></div>
+    </div>
+
+    <div class="widget" id="widget-dials" data-widget="dials">
+      <div class="widget-drag-handle" title="Drag to move">⠿</div>
+      <section class="dials" id="dialGrid" aria-label="Speed dial shortcuts">
+        <!-- dial tiles injected here -->
+      </section>
+      <div class="widget-resize-handle" title="Drag to resize"></div>
+    </div>
+
+    <div class="widget" id="widget-worldclock" data-widget="worldclock">
+      <div class="widget-drag-handle" title="Drag to move">⠿</div>
+      <section class="worldclock-panel" id="worldClockPanel"></section>
+      <section class="worldclock-carousel icon-hidden" id="worldClockCarousel">
+        <div class="worldclock-carousel-track" id="worldClockCarouselTrack"></div>
+      </section>
+      <div class="widget-resize-handle" title="Drag to resize"></div>
+    </div>
+
+    <div class="widget" id="widget-news" data-widget="news">
+      <div class="widget-drag-handle" title="Drag to move">⠿</div>
+      <section class="panel-widget">
+        <div class="panel-widget-head">
+          <h3>News</h3>
+          <button class="panel-refresh" id="newsRefresh" title="Refresh news" aria-label="Refresh news">⟳</button>
+        </div>
+        <ul class="news-list" id="newsList"></ul>
+        <p class="hint" id="newsEmptyHint">Add a feed in Settings → News to get started.</p>
+      </section>
+      <div class="widget-resize-handle" title="Drag to resize"></div>
+    </div>
+
+    <div class="widget" id="widget-stocks" data-widget="stocks">
+      <div class="widget-drag-handle" title="Drag to move">⠿</div>
+      <section class="panel-widget">
+        <div class="panel-widget-head">
+          <h3>Markets</h3>
+          <button class="panel-refresh" id="stocksRefresh" title="Refresh markets" aria-label="Refresh markets">⟳</button>
+        </div>
+        <div class="market-tabs" id="marketTabs">
+          <button class="market-tab active" data-tab="stocks">Stocks</button>
+          <button class="market-tab" data-tab="currency">Currency</button>
+          <button class="market-tab" data-tab="gold">Gold</button>
+        </div>
+        <ul class="stock-list" id="stockList"></ul>
+        <ul class="stock-list icon-hidden" id="currencyList"></ul>
+        <ul class="stock-list icon-hidden" id="goldList"></ul>
+        <p class="hint" id="stocksEmptyHint">Add a free Finnhub API key in Settings → Markets to enable stocks.</p>
+      </section>
+      <div class="widget-resize-handle" title="Drag to resize"></div>
+    </div>
+
+  </main>
+
+  <nav class="dock" aria-label="Panels">
+    <button class="dock-btn" id="openNotes" title="Notes" aria-label="Open notes">
+      <svg viewBox="0 0 24 24"><path d="M5 4h14a1 1 0 0 1 1 1v11l-5 5H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M14 21v-4a1 1 0 0 1 1-1h4"/></svg>
+    </button>
+    <button class="dock-btn" id="openTodo" title="To-do" aria-label="Open to-do list">
+      <svg viewBox="0 0 24 24"><path d="M9 11l2.5 2.5L18 7"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>
+    </button>
+    <button class="dock-btn" id="openMusic" title="Music" aria-label="Open music player">
+      <span class="dock-dot" id="musicDot" hidden></span>
+      <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    </button>
+    <button class="dock-btn" id="openCleaner" title="Junk Cleaner" aria-label="Open Junk Cleaner widget">
+      <svg viewBox="0 0 24 24"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M19 15l.7 2.1L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.9L19 15z"/></svg>
+    </button>
+    <button class="dock-btn" id="openMonitor" title="Resource Monitor" aria-label="Open Resource Monitor widget">
+      <svg viewBox="0 0 24 24"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+    </button>
+    <button class="dock-btn" id="enterLayoutEdit" title="Arrange widgets" aria-label="Arrange widgets">
+      <svg viewBox="0 0 24 24"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>
+    </button>
+    <button class="dock-btn" id="openSettings" title="Settings" aria-label="Open settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V19.6a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H4.4a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H10.5a1.7 1.7 0 0 0 1-1.55V4.4a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V10.5a1.7 1.7 0 0 0 1.55 1h.09a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Add / edit dial modal -->
+  <div class="modal-overlay" id="dialModalOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dialModalTitle">
+      <h2 id="dialModalTitle">Add shortcut</h2>
+      <label class="field">
+        <span>Name</span>
+        <input type="text" id="dialName" placeholder="e.g. Mail" maxlength="40">
+      </label>
+      <label class="field">
+        <span>URL</span>
+        <input type="text" id="dialUrl" placeholder="e.g. mail.google.com">
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" id="dialDelete" hidden>Delete</button>
+        <div class="modal-actions-right">
+          <button type="button" class="btn-ghost" id="dialCancel">Cancel</button>
+          <button type="button" class="btn-primary" id="dialSave">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes drawer -->
+  <aside class="drawer" id="notesDrawer" aria-label="Notes">
+    <div class="drawer-head">
+      <h2>Notes</h2>
+      <button class="drawer-close" data-close>&times;</button>
+    </div>
+    <textarea id="notesArea" class="notes-area" placeholder="Jot something down…"></textarea>
+  </aside>
+
+  <!-- Todo drawer -->
+  <aside class="drawer" id="todoDrawer" aria-label="To-do list">
+    <div class="drawer-head">
+      <h2>To-do</h2>
+      <button class="drawer-close" data-close>&times;</button>
+    </div>
+    <form id="todoForm" class="todo-form" autocomplete="off">
+      <input type="text" id="todoInput" placeholder="Add a task">
+      <button type="submit" class="btn-primary">Add</button>
+    </form>
+    <ul class="todo-list" id="todoList"></ul>
+  </aside>
+
+  <!-- Music drawer -->
+  <aside class="drawer" id="musicDrawer" aria-label="Music player">
+    <div class="drawer-head">
+      <h2>Music</h2>
+      <button class="drawer-close" data-close>&times;</button>
+    </div>
+
+    <div class="player">
+      <div class="player-track" id="playerTrackName">No track selected</div>
+
+      <div class="player-progress">
+        <input type="range" id="playerSeek" min="0" max="100" value="0" step="0.1">
+        <div class="player-times">
+          <span id="playerCurrentTime">0:00</span>
+          <span id="playerDuration">0:00</span>
+        </div>
+      </div>
+
+      <div class="player-controls">
+        <button class="player-btn" id="playerPrev" aria-label="Previous track">
+          <svg viewBox="0 0 24 24"><path d="M19 20 9 12l10-8v16Z"/><path d="M5 19V5"/></svg>
+        </button>
+        <button class="player-btn player-btn-main" id="playerPlay" aria-label="Play">
+          <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pauseIcon" class="icon-hidden" viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+        </button>
+        <button class="player-btn" id="playerNext" aria-label="Next track">
+          <svg viewBox="0 0 24 24"><path d="M5 4l10 8-10 8V4Z"/><path d="M19 5v14"/></svg>
+        </button>
+        <button class="player-btn player-mute" id="playerMute" aria-label="Toggle mute">
+          <svg id="volIcon" viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4Z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>
+          <svg id="muteIcon" class="icon-hidden" viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4Z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>
+        </button>
+      </div>
+
+      <input type="range" id="playerVolume" class="player-volume" min="0" max="100" value="70">
+    </div>
+
+    <div class="playlist-head">
+      <h3>Playlist</h3>
+      <button class="btn-ghost" id="addTracksBtn">Add tracks</button>
+      <input type="file" id="tracksFile" accept="audio/*" multiple hidden>
+    </div>
+    <ul class="playlist" id="playlist"></ul>
+    <p class="hint" id="playlistEmptyHint">Add audio files from your device to build a playlist.</p>
+  </aside>
+
+  <!-- Weather detail drawer (lazy-loaded: only fetches when opened) -->
+  <aside class="drawer drawer-wide" id="weatherDrawer" aria-label="Weather details">
+    <div class="drawer-head">
+      <h2>Weather</h2>
+      <button class="drawer-close" data-close>&times;</button>
+    </div>
+
+    <div class="wx-summary">
+      <span class="wx-summary-icon" id="wxSummaryIcon">🌤️</span>
+      <div>
+        <div class="wx-summary-temp" id="wxSummaryTemp">–°</div>
+        <div class="wx-summary-loc" id="wxSummaryLoc">Set a location in Settings</div>
+      </div>
+      <button class="panel-refresh" id="wxRefresh" title="Refresh" aria-label="Refresh weather details">⟳</button>
+    </div>
+    <p class="hint" id="wxLoadingHint">Loading detailed forecast…</p>
+
+    <div class="wx-grid" id="wxGrid">
+      <div class="wx-card">
+        <h4>Feels like</h4>
+        <div class="wx-big" id="wxFeelsLike">–°</div>
+        <div class="wx-gradient-track"><div class="wx-marker" id="wxFeelsMarker"></div></div>
+        <p class="wx-note" id="wxFeelsNote"></p>
+      </div>
+      <div class="wx-card">
+        <h4>Cloud cover</h4>
+        <div class="wx-big" id="wxCloud">–%</div>
+        <div class="wx-fill-track"><div class="wx-fill cloud" id="wxCloudFill"></div></div>
+        <p class="wx-note" id="wxCloudNote"></p>
+      </div>
+      <div class="wx-card">
+        <h4>Precipitation</h4>
+        <div class="wx-big" id="wxPrecip">–%</div>
+        <div class="wx-fill-track"><div class="wx-fill precip" id="wxPrecipFill"></div></div>
+        <p class="wx-note">Chance in the next few hours</p>
+      </div>
+      <div class="wx-card">
+        <h4>Wind</h4>
+        <div class="wx-compass">
+          <div class="wx-compass-arrow" id="wxWindArrow">↑</div>
+        </div>
+        <div class="wx-big small" id="wxWind">– km/h</div>
+        <p class="wx-note" id="wxWindNote"></p>
+      </div>
+      <div class="wx-card">
+        <h4>Humidity</h4>
+        <div class="wx-big" id="wxHumidity">–%</div>
+        <div class="wx-humidity-bars" id="wxHumidityBars"></div>
+        <p class="wx-note" id="wxDewpoint"></p>
+      </div>
+      <div class="wx-card">
+        <h4>UV index</h4>
+        <div class="gauge-ring" id="wxUvRing" style="width:64px;height:64px; margin:0 auto;"><span class="gauge-val" id="wxUvVal" style="font-size:14px;">–</span></div>
+        <p class="wx-note" id="wxUvNote"></p>
+      </div>
+      <div class="wx-card">
+        <h4>Air quality</h4>
+        <div class="gauge-ring" id="wxAqiRing" style="width:64px;height:64px; margin:0 auto;"><span class="gauge-val" id="wxAqiVal" style="font-size:14px;">–</span></div>
+        <p class="wx-note" id="wxAqiNote"></p>
+      </div>
+      <div class="wx-card">
+        <h4>Visibility</h4>
+        <div class="wx-big" id="wxVisibility">– km</div>
+        <div class="wx-fill-track"><div class="wx-fill vis" id="wxVisFill"></div></div>
+        <p class="wx-note" id="wxVisNote"></p>
+      </div>
+      <div class="wx-card">
+        <h4>Pressure</h4>
+        <div class="wx-big" id="wxPressure">– hPa</div>
+        <div class="wx-fill-track"><div class="wx-fill pressure" id="wxPressureFill"></div></div>
+        <p class="wx-note">At sea level</p>
+      </div>
+      <div class="wx-card">
+        <h4>Moon phase</h4>
+        <div class="wx-moon" id="wxMoonIcon">🌗</div>
+        <p class="wx-note" id="wxMoonNote"></p>
+      </div>
+    </div>
+
+    <div class="settings-group" style="margin-top:18px;">
+      <h3>Source</h3>
+      <div class="option-row" id="weatherSourceOptions">
+        <button class="option-chip" data-wxsource="openmeteo">Open-Meteo</button>
+        <button class="option-chip" data-wxsource="metno">Met.no</button>
+        <button class="option-chip" data-wxsource="wttr">wttr.in</button>
+      </div>
+      <p class="hint">Different sources support different fields — some cards may show "–" depending on your pick. If a source goes offline, switch to another with no code changes needed.</p>
+    </div>
+  </aside>
+
+  <audio id="musicPlayer" preload="metadata"></audio>
+
+  <!-- Junk Cleaner widget drawer -->
+  <aside class="drawer drawer-wide" id="cleanerDrawer" aria-label="Junk Cleaner">
+    <div class="drawer-head">
+      <h2>Junk Cleaner</h2>
+      <button class="drawer-close" data-close>&times;</button>
+    </div>
+
+    <section class="stats" id="cln-stats">
+      <div class="stat">
+        <span class="stat-num" id="cln-stat-tabs">–</span>
+        <span class="stat-label">tabs open</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="cln-stat-history">–</span>
+        <span class="stat-label">history items (7d)</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="cln-stat-downloads">–</span>
+        <span class="stat-label">downloads</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="cln-stat-cookies">–</span>
+        <span class="stat-label">cookies (open tabs)</span>
+      </div>
+    </section>
+
+    <section class="widget-panel">
+      <h3 class="widget-panel-title">Cleaning level</h3>
+      <div class="levels" id="cln-levels">
+        <button class="level" data-level="hour">
+          <span class="level-name">Quick</span>
+          <span class="level-desc">Last hour</span>
+        </button>
+        <button class="level" data-level="week">
+          <span class="level-name">Balanced</span>
+          <span class="level-desc">Last 7 days</span>
+        </button>
+        <button class="level" data-level="month">
+          <span class="level-name">Deep</span>
+          <span class="level-desc">Last 4 weeks</span>
+        </button>
+        <button class="level" data-level="all">
+          <span class="level-name">Max</span>
+          <span class="level-desc">Everything</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="widget-panel">
+      <div class="widget-panel-head-row">
+        <h3 class="widget-panel-title">What to clean</h3>
+        <button class="link-btn" id="cln-toggle-all">Select all</button>
+      </div>
+      <div class="checks" id="cln-checks">
+        <label class="check"><input type="checkbox" value="cache" checked><span>Cache &amp; cached images</span></label>
+        <label class="check"><input type="checkbox" value="cookies" checked><span>Cookies &amp; site data</span></label>
+        <label class="check"><input type="checkbox" value="history"><span>Browsing history</span></label>
+        <label class="check"><input type="checkbox" value="downloads"><span>Download list (not files on disk)</span></label>
+        <label class="check"><input type="checkbox" value="formData"><span>Autofill form data</span></label>
+        <label class="check"><input type="checkbox" value="serviceWorkers"><span>Service workers</span></label>
+        <label class="check"><input type="checkbox" value="localStorage"><span>Local &amp; session storage</span></label>
+        <label class="check"><input type="checkbox" value="indexedDB"><span>IndexedDB</span></label>
+      </div>
+    </section>
+
+    <button class="clean-btn" id="cln-clean-btn">
+      <span id="cln-clean-btn-label">Clean now</span>
+    </button>
+    <p class="result" id="cln-result"></p>
+
+    <section class="widget-panel">
+      <div class="widget-panel-head-row">
+        <h3 class="widget-panel-title">Stale tabs</h3>
+        <span class="badge" id="cln-stale-count">0</span>
+      </div>
+      <p class="widget-panel-hint">Tabs you haven't touched in a while. Pinned and audible (playing sound) tabs are always skipped.</p>
+      <div class="slider-row">
+        <input type="range" id="cln-stale-threshold" min="1" max="72" value="12" step="1">
+        <span class="slider-val" id="cln-stale-threshold-val">12h</span>
+      </div>
+      <button class="secondary-btn" id="cln-close-stale-btn">Close stale tabs</button>
+    </section>
+
+    <section class="widget-panel">
+      <div class="widget-panel-head-row">
+        <h3 class="widget-panel-title">Auto-sweep</h3>
+        <label class="switch">
+          <input type="checkbox" id="cln-auto-sweep-toggle">
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+        </label>
+      </div>
+      <p class="widget-panel-hint">When on, runs your selected categories (last hour only, for safety) each time Brave starts up.</p>
+    </section>
+  </aside>
+
+  <!-- Resource Monitor widget drawer -->
+  <aside class="drawer drawer-wide" id="monitorDrawer" aria-label="Resource Monitor">
+    <div class="drawer-head">
+      <h2>Resource Monitor</h2>
+      <button class="drawer-close" data-close>&times;</button>
+    </div>
+
+    <section class="gauges">
+      <div class="gauge">
+        <div class="gauge-ring" id="mon-cpu-ring">
+          <span class="gauge-val" id="mon-cpu-val">–%</span>
+        </div>
+        <span class="gauge-label">CPU (system)</span>
+      </div>
+      <div class="gauge">
+        <div class="gauge-ring" id="mon-mem-ring">
+          <span class="gauge-val" id="mon-mem-val">–%</span>
+        </div>
+        <span class="gauge-label">RAM (system)</span>
+      </div>
+    </section>
+
+    <p class="mem-detail" id="mon-mem-detail">–</p>
+
+    <section class="stats-row">
+      <div class="stat">
+        <span class="stat-num" id="mon-stat-tabs">–</span>
+        <span class="stat-label">tabs open</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="mon-stat-discarded">–</span>
+        <span class="stat-label">suspended now</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="mon-stat-updated">–</span>
+        <span class="stat-label">last check</span>
+      </div>
+    </section>
+
+    <section class="widget-panel">
+      <div class="widget-panel-head-row">
+        <h3 class="widget-panel-title">Auto-suspend limiter</h3>
+        <label class="switch">
+          <input type="checkbox" id="mon-auto-toggle">
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+        </label>
+      </div>
+      <p class="widget-panel-hint">
+        When on, suspends your least-recently-used background tabs (never
+        the active tab, pinned tabs, or ones playing audio) to stay under
+        the limits below.
+      </p>
+
+      <div class="range-field">
+        <div class="field-label-row">
+          <label for="mon-max-tabs">Max tabs kept active</label>
+          <span class="field-val" id="mon-max-tabs-val">Off</span>
+        </div>
+        <input type="range" id="mon-max-tabs" min="0" max="50" step="1" value="0">
+      </div>
+
+      <div class="range-field">
+        <div class="field-label-row">
+          <label for="mon-min-free-mem">Keep at least this much RAM free</label>
+          <span class="field-val" id="mon-min-free-mem-val">Off</span>
+        </div>
+        <input type="range" id="mon-min-free-mem" min="0" max="50" step="5" value="0">
+      </div>
+
+      <label class="check">
+        <input type="checkbox" id="mon-notify-toggle" checked>
+        <span>Notify me when tabs get suspended</span>
+      </label>
+    </section>
+
+    <section class="widget-panel">
+      <h3 class="widget-panel-title">Recent activity</h3>
+      <ul class="log" id="mon-log-list">
+        <li class="log-empty">Nothing suspended yet.</li>
+      </ul>
+    </section>
+
+    <p class="disclaimer">
+      CPU and RAM figures are <strong>system-wide</strong> — Brave doesn't expose
+      its own process usage to extensions, and no extension can enforce a hard
+      OS-level cap. Limits above work by suspending tabs, which is the
+      practical way to bring the browser's own footprint down.
+    </p>
+  </aside>
+
+  <!-- Settings drawer -->
+  <aside class="drawer" id="settingsDrawer" aria-label="Settings">
+    <div class="drawer-head">
+      <h2>Settings</h2>
+      <button class="drawer-close" data-close>&times;</button>
+    </div>
+
+    <div class="settings-group">
+      <h3>Accent</h3>
+      <div class="swatches" id="accentSwatches"></div>
+      <div class="custom-accent-fields icon-hidden" id="customAccentFields">
+        <label class="field-inline">
+          <span>Primary</span>
+          <input type="color" id="customAccentA" value="#ff4d8d">
+        </label>
+        <label class="field-inline">
+          <span>Secondary</span>
+          <input type="color" id="customAccentB" value="#4de8ff">
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h3>Font</h3>
+      <div class="option-row" id="fontOptions">
+        <button class="option-chip" data-font="default">Default</button>
+        <button class="option-chip" data-font="retro">Retro</button>
+        <button class="option-chip" data-font="elegant">Elegant</button>
+        <button class="option-chip" data-font="modern">Modern</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h3>Background</h3>
+      <div class="option-row" id="bgOptions">
+        <button class="option-chip" data-bg="grid">Grid</button>
+        <button class="option-chip" data-bg="plain">Plain</button>
+        <button class="option-chip" data-bg="glow">Glow</button>
+        <button class="option-chip" data-bg="image">Image</button>
+        <button class="option-chip" data-bg="video">Live video</button>
+      </div>
+
+      <div class="wallpaper-controls" id="wallpaperControls" hidden>
+        <p class="hint" id="wallpaperHint">Choose a video file to loop as your background.</p>
+        <div class="option-row">
+          <button class="btn-ghost" id="wallpaperUploadBtn">Choose file…</button>
+          <button class="btn-ghost danger" id="wallpaperRemoveBtn">Remove</button>
+        </div>
+        <input type="file" id="wallpaperFile" hidden>
+        <label class="field dim-field">
+          <span>Dim overlay <span id="dimValue">45%</span></span>
+          <input type="range" id="wallpaperDim" min="0" max="80" value="45">
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h3>Weather</h3>
+      <div class="field-row">
+        <input type="text" id="weatherCityInput" class="text-input" placeholder="City, e.g. Colombo">
+        <button class="btn-ghost" id="weatherCitySave">Set</button>
+      </div>
+      <div class="option-row" style="margin-top:8px;">
+        <button class="btn-ghost" id="weatherUseLocation">Use my location</button>
+        <button class="option-chip" data-unit="c">°C</button>
+        <button class="option-chip" data-unit="f">°F</button>
+      </div>
+      <p class="hint" id="weatherHint"></p>
+
+      <h3 style="margin-top:16px;">Widget display</h3>
+      <div class="option-row" id="weatherWidgetModeOptions">
+        <button class="option-chip" data-wxmode="simple">Simple</button>
+        <button class="option-chip" data-wxmode="day">Day recap</button>
+        <button class="option-chip" data-wxmode="week">Week recap</button>
+      </div>
+      <p class="hint">Simple shows just temperature and city. Day and Week pull extra detail (and a week's forecast) into the widget itself, refreshed on the same 30-minute schedule as the rest of the weather data.</p>
+    </div>
+
+    <div class="settings-group">
+      <h3>Clock style</h3>
+      <div class="option-row" id="clockStyleOptions">
+        <button class="option-chip" data-clockstyle="digital">Digital</button>
+        <button class="option-chip" data-clockstyle="nixie">Nixie</button>
+        <button class="option-chip" data-clockstyle="analog">Analog</button>
+        <button class="option-chip" data-clockstyle="flip">Flip</button>
+        <button class="option-chip" data-clockstyle="led">LED</button>
+        <button class="option-chip" data-clockstyle="minimal">Minimal</button>
+      </div>
+      <div class="custom-accent-fields" style="margin-top:14px;">
+        <label class="field-inline">
+          <span>Date color</span>
+          <input type="color" id="dateColorInput" value="#8a84b0">
+        </label>
+        <label class="field-inline">
+          <span>Greeting color</span>
+          <input type="color" id="greetingColorInput" value="#edeafb">
+        </label>
+      </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h3>Widgets</h3>
+      <div class="option-row" style="margin-bottom:10px;">
+        <button class="btn-ghost" id="enterLayoutEditFromSettings">Arrange widgets</button>
+        <button class="btn-ghost" id="resetLayoutBtn">Reset positions</button>
+      </div>
+      <div class="widget-toggle-list" id="widgetToggleList"></div>
+    </div>
+
+    <div class="settings-group">
+      <h3>World clock</h3>
+      <div class="option-row" id="worldClockStyleOptions">
+        <button class="option-chip" data-wcstyle="classic">Classic row</button>
+        <button class="option-chip" data-wcstyle="carousel">Rotating door</button>
+      </div>
+      <div class="field-row" style="margin-top:10px;">
+        <select class="text-input" id="worldClockCitySelect"></select>
+        <button class="btn-ghost" id="worldClockAdd">Add</button>
+      </div>
+      <div class="chip-list" id="worldClockChipList"></div>
+      <p class="hint">Enable the World clock widget above to show these on your dashboard. "Rotating door" shows two cities at a time — scroll over the widget to reveal the next one.</p>
+    </div>
+
+    <div class="settings-group">
+      <h3>News feeds</h3>
+      <div class="field-row">
+        <input type="text" id="newsFeedLabel" class="text-input" placeholder="Label, e.g. BBC News" style="flex:0 0 40%;">
+        <input type="text" id="newsFeedUrl" class="text-input" placeholder="RSS feed URL">
+      </div>
+      <button class="btn-ghost" id="newsFeedAdd" style="margin-top:8px; width:100%;">Add feed</button>
+      <ul class="feed-list" id="newsFeedList"></ul>
+      <p class="hint">Headlines are fetched through the free rss2json.com proxy so feeds without CORS support still work. Thumbnails show automatically when a feed provides one.</p>
+    </div>
+
+    <div class="settings-group">
+      <h3>Markets — Stocks</h3>
+      <div class="option-row" id="stockProviderOptions">
+        <button class="option-chip" data-stockprovider="finnhub">Finnhub</button>
+        <button class="option-chip" data-stockprovider="twelvedata">Twelve Data</button>
+      </div>
+      <div class="field-row" style="margin-top:8px;">
+        <input type="text" id="finnhubKeyInput" class="text-input" placeholder="Finnhub API key">
+        <button class="btn-ghost" id="finnhubKeySave">Save</button>
+      </div>
+      <div class="field-row" style="margin-top:8px;">
+        <input type="text" id="twelvedataKeyInput" class="text-input" placeholder="Twelve Data API key">
+        <button class="btn-ghost" id="twelvedataKeySave">Save</button>
+      </div>
+      <p class="hint">Both keys are saved at once, whichever source is active above — switching sources won't lose the other key.</p>
+      <div class="field-row" style="margin-top:8px;">
+        <input type="text" id="stockTickerInput" class="text-input" placeholder="Ticker, e.g. AAPL" style="text-transform:uppercase;">
+        <button class="btn-ghost" id="stockTickerAdd">Add</button>
+      </div>
+      <div class="chip-list" id="stockTickerList"></div>
+      <div class="field-row" style="margin-top:12px; align-items:center;">
+        <span style="font-size:12.5px; color:var(--muted); flex-shrink:0;">Refresh every</span>
+        <select class="text-input" id="stockRefreshInterval">
+          <option value="5">5 min</option>
+          <option value="10">10 min</option>
+          <option value="15">15 min</option>
+          <option value="30">30 min</option>
+          <option value="60">60 min</option>
+        </select>
+      </div>
+      <p class="hint">
+        Finnhub: free key at <a href="https://finnhub.io/register" target="_blank" rel="noopener">finnhub.io/register</a>.
+        Twelve Data: free key at <a href="https://twelvedata.com/pricing" target="_blank" rel="noopener">twelvedata.com</a>.
+        If one source goes down or changes its terms, switch to the other — no update needed.
+        Free plans have daily/per-minute call limits — each ticker uses one call per refresh, so more tickers or a shorter interval uses your quota faster. The trend graph is now built from prices sampled locally over time (no extra API calls), so it works the same on either source and starts filling in a few refreshes after you add a ticker.
+      </p>
+    </div>
+
+    <div class="settings-group">
+      <h3>Markets — Currency</h3>
+      <div class="option-row" id="currencyProviderOptions">
+        <button class="option-chip" data-currencyprovider="frankfurter">Frankfurter (ECB)</button>
+        <button class="option-chip" data-currencyprovider="erapi">Open ER-API</button>
+      </div>
+      <div class="field-row" style="margin-top:8px;">
+        <input type="text" id="currencyFromInput" class="text-input" placeholder="From, e.g. USD" style="text-transform:uppercase;">
+        <input type="text" id="currencyToInput" class="text-input" placeholder="To, e.g. EUR" style="text-transform:uppercase;">
+        <button class="btn-ghost" id="currencyAdd">Add</button>
+      </div>
+      <div class="chip-list" id="currencyPairList"></div>
+      <p class="hint">Frankfurter uses European Central Bank reference rates, no key needed, been stable for years. Open ER-API is a free no-key mirror as a backup.</p>
+    </div>
+
+    <div class="settings-group">
+      <h3>Markets — Gold</h3>
+      <div class="option-row" id="goldProviderOptions">
+        <button class="option-chip" data-goldprovider="goldprice">Goldprice.org</button>
+      </div>
+      <div class="field-row" style="margin-top:8px;">
+        <select class="text-input" id="goldCurrencySelect">
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="GBP">GBP</option>
+          <option value="JPY">JPY</option>
+          <option value="INR">INR</option>
+          <option value="AUD">AUD</option>
+          <option value="CNY">CNY</option>
+        </select>
+        <label class="check" style="flex-shrink:0;"><input type="checkbox" id="goldEnabled"><span>Show gold price</span></label>
+      </div>
+      <p class="hint">Free, no-key gold spot price. If this source ever goes offline, let me know the new one and I'll wire it in the same way — the settings and widget won't need to change.</p>
+    </div>
+
+    <div class="settings-group">
+      <h3>Default search engine</h3>
+      <div class="option-row" id="engineOptions">
+        <button class="option-chip" data-engine="brave">Brave</button>
+        <button class="option-chip" data-engine="google">Google</button>
+        <button class="option-chip" data-engine="ddg">DuckDuckGo</button>
+        <button class="option-chip" data-engine="bing">Bing</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h3>Your name</h3>
+      <input type="text" id="userName" class="text-input" placeholder="Optional, used in the greeting" maxlength="24">
+    </div>
+
+    <div class="settings-group">
+      <h3>Backup &amp; restore</h3>
+      <p class="hint">Save everything — widget positions/sizes, colors, fonts, wallpaper, weather/news/markets setup, and shortcuts — as one file. Handy for moving to another browser or account without reconfiguring from scratch.</p>
+      <div class="option-row">
+        <button class="btn-ghost" id="fullExportBtn">Export full backup</button>
+        <button class="btn-ghost" id="fullImportBtn">Import full backup</button>
+        <input type="file" id="fullImportFile" accept="application/json" hidden>
+      </div>
+      <p class="hint" id="fullBackupHint">Doesn't include notes, to-dos, or your music playlist's audio files (those stay device-local). If your wallpaper is a large video, it's left out of the file — you'll need to re-pick it after importing. The file includes any API keys you've entered in plain text, so keep it somewhere private.</p>
+    </div>
+
+    <div class="settings-group">
+      <h3>Shortcuts data</h3>
+      <div class="option-row">
+        <button class="btn-ghost" id="exportBtn">Export JSON</button>
+        <button class="btn-ghost" id="importBtn">Import JSON</button>
+        <input type="file" id="importFile" accept="application/json" hidden>
+      </div>
+      <button class="btn-ghost danger" id="resetBtn">Reset to defaults</button>
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim"></div>
+
+  <script src="js/resource-helpers.js"></script>
+  <script src="js/cleaner-widget.js"></script>
+  <script src="js/monitor-widget.js"></script>
+  <script src="js/newtab.js"></script>
+</body>
+</html>
